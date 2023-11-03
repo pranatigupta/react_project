@@ -7,23 +7,33 @@ const FilterUser: React.FC<{ users: UserProfileData[] }> = ({ users }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedGender, setSelectedGender] = useState(''); // Initialize with an empty string
     const [selectedStatus, setSelectedStatus] = useState(''); 
+    const [selectedLocation, setSelectedLocation] = useState(''); 
+    const [selectedSpecies, setSelectedSpecies] = useState(''); 
 
     const [genders, setGenders] = useState<string[]>([]);
+    const [status, setStatus] = useState<string[]>([]);
+    const [location, setLocation] = useState<string[]>([]);
+    const [species, setSpecies] = useState<string[]>([]);
+
 
     useEffect(() => {
         const gen = new Set<string>();
+        const st = new Set<string>();
+        const loc = new Set<string>();
+        const sp = new Set<string>();
         users.forEach((user) => {
-            console.log(user.gender);
             gen.add(user.gender);
+            st.add(user.status);
+            if (user.location) loc.add(user.location.name);
+            if(user.species) sp.add(user.species);
         })
-        console.log(gen);
         setGenders(Array.from(gen));
-    }, [])
-
-    useEffect(() => {
-        console.log(genders, "gwetuvybgtcoi");
-    }, [genders])
+        setLocation(Array.from(loc));
+        setSpecies(Array.from(sp));
+        setStatus(Array.from(st));
+    }, [users])
   
+
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(event.target.value);
       };
@@ -33,12 +43,20 @@ const FilterUser: React.FC<{ users: UserProfileData[] }> = ({ users }) => {
     const handleStatusChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedStatus(event.target.value);
       };
+      const handleLocationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedLocation(event.target.value);
+      };
+      const handleSpeciesChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedSpecies(event.target.value);
+      };
   
     const filteredUsers = users.filter((user) => {
         const nameMatch = user.name.toLowerCase().includes(searchQuery.toLowerCase());
         const genderMatch = selectedGender === '' || user.gender === selectedGender;
         const statusMatch = selectedStatus === '' || user.status === selectedStatus;
-        return nameMatch && genderMatch && statusMatch;
+        const speciesMatch = selectedSpecies === '' || user.species === selectedSpecies;
+        const locationMatch = selectedLocation === '' || user.location?.name === selectedLocation;
+        return nameMatch && genderMatch && statusMatch && locationMatch && speciesMatch;
     }
     );
   
@@ -62,10 +80,6 @@ const FilterUser: React.FC<{ users: UserProfileData[] }> = ({ users }) => {
                         genders.map((gender) => {
                             return <option value={gender}>{gender}</option>
                         })}
-                    {/* <option value="">All</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Unknown">Unknown</option> */}
                     </select>
                 </div>
                 
@@ -73,9 +87,32 @@ const FilterUser: React.FC<{ users: UserProfileData[] }> = ({ users }) => {
                     <label htmlFor="statusFilter">Status: </label>
                     <select id="statusFilter" onChange={handleStatusChange}>
                         <option value="">All</option>
-                        <option value="Alive">Alive</option>
-                        <option value="Dead">Dead</option>
-                        <option value="Unknown">Unknown</option>
+                        {
+                        status.map((status) => {
+                            return <option value={status}>{status}</option>
+                        })}
+                    </select>
+                </div>
+
+                <div className='common-padding'>
+                    <label htmlFor="locationFilter">Location: </label>
+                    <select id="locationFilter" onChange={handleLocationChange}>
+                        <option value="">All</option>
+                        {
+                        location.map((location) => {
+                            return <option value={location}>{location}</option>
+                        })}
+                    </select>
+                </div>
+
+                <div className='common-padding'>
+                    <label htmlFor="speciesFilter">Species: </label>
+                    <select id="speciesFilter" onChange={handleSpeciesChange}>
+                        <option value="">All</option>
+                        {
+                        species.map((species) => {
+                            return <option value={species}>{species}</option>
+                        })}
                     </select>
                 </div>
             </div>

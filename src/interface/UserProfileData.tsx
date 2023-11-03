@@ -4,6 +4,11 @@ interface UserProfileData {
     image: string;
     status: string;
     gender: string;
+    location?: {
+      name: string;
+      url: string;
+    };
+    species? : string;
   }
 
   export default UserProfileData;
